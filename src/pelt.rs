@@ -1,41 +1,48 @@
-use crate::estimator::Estimator;
+use crate::estimator::MutEstimator;
 
 #[derive(Debug)]
 struct Pelt {
-    jump: u64,
-    min_size: u64,
+    jump: u32,
+    min_size: u32,
+    n_samples: usize,
+    best_partition: Option<Vec<usize>>,
 }
 
 impl Pelt {
-    fn new(jump: Option<u64>, min_size: Option<u64>) -> Pelt {
+    fn new(jump: Option<u32>, min_size: Option<u32>) -> Pelt {
         let jump = match jump {
             Some(v) => v,
-            _ => 5
+            _ => 5,
         };
 
         let min_size = match min_size {
             Some(v) => v,
-            _ => 2
+            _ => 2,
         };
 
-        Pelt{jump, min_size}
+        Pelt {
+            jump,
+            min_size,
+            n_samples: 0,
+            best_partition: None,
+        }
     }
 }
 
-impl Estimator<Vec<f64>> for Pelt {
-    fn fit(&self, signal: Vec<f64>) -> &Self {
+impl MutEstimator<Vec<f64>> for Pelt {
+    fn fit(&mut self, signal: Vec<f64>) -> &Self {
+        self.n_samples = signal.len();
         self
     }
 
-    fn predict(&self, signal: Vec<f64>) -> Vec<f64> {
-        vec!(0.)
+    fn predict(&mut self, signal: Vec<f64>) -> Vec<f64> {
+        vec![0.]
     }
 
-    fn fit_predict(&self, signal: Vec<f64>) -> Vec<f64> {
-        vec!(0.)
+    fn fit_predict(&mut self, signal: Vec<f64>) -> Vec<f64> {
+        vec![0.]
     }
 }
-
 
 #[cfg(test)]
 mod test {
