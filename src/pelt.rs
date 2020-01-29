@@ -2,14 +2,15 @@ use crate::estimator::MutEstimator;
 
 #[derive(Debug)]
 struct Pelt {
-    jump: u32,
-    min_size: u32,
+    jump: usize,
+    /// Min size of the signal.
+    min_size: usize,
     n_samples: usize,
     best_partition: Option<Vec<usize>>,
 }
 
 impl Pelt {
-    fn new(jump: Option<u32>, min_size: Option<u32>) -> Pelt {
+    fn new(jump: Option<usize>, min_size: Option<usize>) -> Pelt {
         let jump = match jump {
             Some(v) => v,
             _ => 5,
@@ -44,6 +45,24 @@ impl MutEstimator<Vec<f64>> for Pelt {
     }
 }
 
+
+/// Proposed changepoint indexes
+///
+/// # Arguments
+/// * `n_samples` - Length of the signal
+/// * `jump` - Step size.
+/// * `min_size` - Minimal size of the proposed indexes.
+fn proposed_idx(n_samples: usize, jump: usize, min_size: usize) -> Vec<usize> {
+    let mut idx = vec!();
+    for k in (0..n_samples).step_by(jump) {
+        if k >= min_size {
+            idx.push(k)
+        }
+    }
+    idx.push(n_samples);
+    idx
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -56,5 +75,11 @@ mod test {
 
         let p = Pelt::new(Some(50), None);
         assert_eq!(p.jump, 50)
+    }
+
+    #[test]
+    fn test_proposed_idx() {
+        println!("{:?}", proposed_idx(20, 5, 2));
+        assert_eq!(proposed_idx(20, 5, 2), vec!(5, 10, 15, 20))
     }
 }
