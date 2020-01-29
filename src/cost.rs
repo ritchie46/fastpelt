@@ -5,7 +5,6 @@ pub fn log_pdf(x: f64, mean: f64, std_dev: f64) -> f64 {
     (-0.5 * d * d) - consts::LN_SQRT_2PI - std_dev.ln()
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
