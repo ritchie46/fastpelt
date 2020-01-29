@@ -31,20 +31,19 @@ impl Pelt {
 }
 
 impl MutEstimator<Vec<f64>> for Pelt {
-    fn fit(&mut self, signal: Vec<f64>) -> &Self {
+    fn fit(&mut self, signal: &Vec<f64>) -> &Self {
         self.n_samples = signal.len();
         self
     }
 
-    fn predict(&mut self, signal: Vec<f64>) -> Vec<f64> {
+    fn predict(&mut self, signal: &Vec<f64>) -> Vec<f64> {
         vec![0.]
     }
 
-    fn fit_predict(&mut self, signal: Vec<f64>) -> Vec<f64> {
+    fn fit_predict(&mut self, signal: &Vec<f64>) -> Vec<f64> {
         vec![0.]
     }
 }
-
 
 /// Proposed changepoint indexes
 ///
@@ -53,7 +52,7 @@ impl MutEstimator<Vec<f64>> for Pelt {
 /// * `jump` - Step size.
 /// * `min_size` - Minimal size of the proposed indexes.
 fn proposed_idx(n_samples: usize, jump: usize, min_size: usize) -> Vec<usize> {
-    let mut idx = vec!();
+    let mut idx = vec![];
     for k in (0..n_samples).step_by(jump) {
         if k >= min_size {
             idx.push(k)
