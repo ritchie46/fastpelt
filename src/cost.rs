@@ -29,7 +29,6 @@ fn median(numbers: &[f64]) -> f64 {
     } else {
         numbers[mid]
     }
-
 }
 
 pub fn l2(signal: &[f64], start: usize, end: usize) -> f64 {
@@ -42,7 +41,6 @@ pub fn l1(signal: &[f64], start: usize, end: usize) -> f64 {
 
     sub.iter().map(|a| (a - med).abs()).sum()
 }
-
 
 #[cfg(test)]
 mod tests {

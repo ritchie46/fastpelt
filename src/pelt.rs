@@ -1,6 +1,7 @@
+use crate::cost;
 use crate::estimator::MutEstimator;
 use std::collections::HashMap;
-use crate::cost;
+use test::Bencher;
 
 macro_rules! dict(
 { $($key:expr => $value:expr),+} => {{
@@ -61,9 +62,8 @@ impl Pelt {
             let new_adm_pt = (((bp as f64 - min_size) / jump).floor() * jump) as usize;
             admissible.push(new_adm_pt);
 
-            let mut subproblems = vec!();
+            let mut subproblems = vec![];
             for t in &admissible {
-
                 let tmp_part = partitions_map.get(t);
                 let mut tmp_part = match tmp_part {
                     // First partition of 0:t doesn't yet exist
@@ -84,28 +84,34 @@ impl Pelt {
             let mut min_val = 1e99;
             for (i, d) in subproblems.iter().enumerate() {
                 let c = d.values().sum::<f64>();
-                if  c < min_val {
+                if c < min_val {
                     min_val = c;
                     min_part = &subproblems[i]
                 }
             }
             partitions_map.insert(bp, min_part.clone());
 
-            let mut temp_admissible = vec!();
-            let sum_part_bp: f64 = partitions_map.get(&bp).unwrap().values().sum();
-            for (t, partition) in admissible.iter().zip(subproblems) {
-                let c = partition.values().sum::<f64>();
-                if c < (sum_part_bp + lambda) {
-                    temp_admissible.push(*t);
-                }
-            }
+            let loss_current_part: f64 = partitions_map.get(&bp).unwrap().values().sum();
+
+            let mut temp_admissible = admissible
+                .iter()
+                .zip(subproblems)
+                // get total loss of partition
+                .map(|(t, partition)| (t, partition.values().sum::<f64>()))
+                // keep elements that have a lower loss than the current partition
+                .filter(|(t, sum_loss)| sum_loss < &(loss_current_part + lambda))
+                // only keep t
+                .map(|(t, sum_loss)| *t)
+                .collect();
+
             admissible.clear();
             admissible.append(&mut temp_admissible);
         }
         let best_part = &partitions_map[&self.n_samples];
         let mut cp: Vec<usize> = best_part.keys().map(|(start, end)| *end).collect();
         cp.sort();
-        cp[1..].to_vec()
+        cp.remove(0);
+        cp
     }
 }
 
@@ -164,7 +170,7 @@ mod _tests {
     fn pelt_fixture() -> (Pelt, Vec<f64>) {
         let mut p = Pelt::new(Some(5), Some(2));
         let s = std::fs::read_to_string("signal.txt").unwrap();
-        let signal :Vec<f64> = s.split("\n").map(|x|x.parse().unwrap()).collect();
+        let signal: Vec<f64> = s.split("\n").map(|x| x.parse().unwrap()).collect();
         p.fit(&signal);
         (p, signal)
     }
