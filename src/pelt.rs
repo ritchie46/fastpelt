@@ -76,6 +76,15 @@ impl Pelt {
             admissible.push(new_adm_pt);
 
             let mut subproblems = vec![];
+            // subproblems will be filled with complete partitioning until bp
+            // consider admissible of [0, 5, 10, 15]
+            // subproblems could look like:
+            //  [
+            //      {(0, 15): 23.67, (0, 0): 0.0},
+            //      {(0, 5): 14.60, (5, 15): 18.48, (0, 0): 0.0},
+            //      {(10, 15): 14.17, (0, 10): 19.22, (0, 0): 0.0}
+            // ]
+            // Note that every sub-dict is a complete partitioning of the input signal
             for t in &admissible {
                 let tmp_part = partitions_map.get(t);
                 let mut tmp_part = match tmp_part {
