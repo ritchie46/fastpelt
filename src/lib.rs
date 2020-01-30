@@ -17,9 +17,9 @@ fn fastpelt(py: Python, m: &PyModule) -> PyResult<()> {
         min_size: usize,
         loss: &str,
         jump: usize,
-        lambda: f64,
+        pen: f64,
     ) -> PyResult<Vec<usize>> {
-        let mut p = pelt::Pelt::new(Some(jump), Some(min_size), Some(loss), lambda);
+        let mut p = pelt::Pelt::new(Some(jump), Some(min_size), Some(loss), pen);
         Ok(p.fit_predict(&signal))
     }
 
