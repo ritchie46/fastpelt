@@ -6,7 +6,7 @@ export PATH="$HOME/.cargo/bin:$PATH"
 
 cd /io
 
-for PYBIN in /opt/python/{cp37-cp37m,cp36-cp36m,cp38-cp38m}/bin; do
+for PYBIN in /opt/python/{cp37-cp37m,cp36-cp36m,cp38-cp38}/bin; do
     export PYTHON_SYS_EXECUTABLE="$PYBIN/python"
 #  pin wheel version
 # https://github.com/pypa/auditwheel/issues/102

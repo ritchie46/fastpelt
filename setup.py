@@ -17,7 +17,7 @@ setup_requires = ["setuptools-rust>=0.10.1", "wheel"]
 setup(
     name="fastpelt",
     version="0.1",
-    rust_extensions=[RustExtension("fastpelt.fastpeltrust", binding=Binding.PyO3)],
+    rust_extensions=[RustExtension("fastpelt.fastpeltrust", debug=False, binding=Binding.PyO3)],
     packages=["fastpelt"],
     include_package_data=True,
     # rust extensions are not zip safe, just like C-extensions.
