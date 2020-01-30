@@ -142,7 +142,7 @@ fn proposed_idx(n_samples: usize, jump: usize, min_size: usize) -> Vec<usize> {
 }
 
 #[cfg(test)]
-mod test {
+mod _tests {
     use super::*;
 
     #[test]
@@ -161,15 +161,18 @@ mod test {
         assert_eq!(proposed_idx(20, 5, 2), vec!(5, 10, 15, 20))
     }
 
-    #[test]
-    fn test_segmentation() {
+    fn pelt_fixture() -> (Pelt, Vec<f64>) {
         let mut p = Pelt::new(Some(5), Some(2));
-
         let s = std::fs::read_to_string("signal.txt").unwrap();
         let signal :Vec<f64> = s.split("\n").map(|x|x.parse().unwrap()).collect();
         p.fit(&signal);
+        (p, signal)
+    }
+
+    #[test]
+    fn test_segmentation() {
+        let (p, signal) = pelt_fixture();
         let cp = p.segmentation(10., &signal);
-        println!("{:?}", cp);
-        assert!(false)
+        assert_eq!(cp, [100, 200]);
     }
 }
