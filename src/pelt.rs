@@ -94,7 +94,7 @@ impl Pelt {
 
             let loss_current_part: f64 = partitions_map.get(&bp).unwrap().values().sum();
 
-            let mut temp_admissible = admissible
+            admissible = admissible
                 .iter()
                 .zip(subproblems)
                 // get total loss of partition
@@ -104,9 +104,6 @@ impl Pelt {
                 // only keep t
                 .map(|(t, sum_loss)| *t)
                 .collect();
-
-            admissible.clear();
-            admissible.append(&mut temp_admissible);
         }
         let best_part = &partitions_map[&self.n_samples];
         let mut cp: Vec<usize> = best_part.keys().map(|(start, end)| *end).collect();
