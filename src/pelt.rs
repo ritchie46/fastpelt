@@ -2,10 +2,11 @@ use crate::cost;
 extern crate test;
 use crate::estimator::MutEstimator;
 use std::collections::HashMap;
+use fnv::FnvHashMap;
 
 macro_rules! dict(
 { $($key:expr => $value:expr),+} => {{
-    let mut m = HashMap::new();
+    let mut m = FnvHashMap::default();
     $(
        m.insert($key, $value);
     )+
