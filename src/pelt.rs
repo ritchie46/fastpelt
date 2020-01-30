@@ -1,7 +1,6 @@
 use crate::cost;
 use crate::estimator::MutEstimator;
 use std::collections::HashMap;
-use test::Bencher;
 
 macro_rules! dict(
 { $($key:expr => $value:expr),+} => {{
@@ -13,17 +12,18 @@ macro_rules! dict(
 }}
 );
 
-#[derive(Debug)]
 struct Pelt {
     jump: usize,
     /// Min size of the signal.
     min_size: usize,
     n_samples: usize,
     best_partition: Option<Vec<usize>>,
+    loss: fn(signal: &[f64], start: usize, end: usize) -> f64,
+    lambda: f64,
 }
 
 impl Pelt {
-    fn new(jump: Option<usize>, min_size: Option<usize>) -> Pelt {
+    fn new(jump: Option<usize>, min_size: Option<usize>, loss: Option<&str>, lambda: f64) -> Pelt {
         let jump = match jump {
             Some(v) => v,
             _ => 5,
@@ -34,15 +34,26 @@ impl Pelt {
             _ => 2,
         };
 
+        let loss = match loss {
+            Some(s) => match s {
+                "l1" => cost::l1,
+                "l2" => cost::l2,
+                _ => panic!("Other loss function not implemented."),
+            },
+            _ => cost::l1,
+        };
+
         Pelt {
             jump,
             min_size,
             n_samples: 0,
             best_partition: None,
+            loss,
+            lambda,
         }
     }
 
-    fn segmentation(&self, lambda: f64, signal: &Vec<f64>) -> Vec<usize> {
+    fn segmentation(&self, signal: &Vec<f64>) -> Vec<usize> {
         let idx = proposed_idx(self.n_samples, self.jump, self.min_size);
 
         // Maps (t, breakpoint) to loss + Lambda
@@ -53,6 +64,7 @@ impl Pelt {
         let min_size = self.min_size as f64;
         let jump = self.jump as f64;
         let mut admissible: Vec<usize> = vec![];
+        let loss_fn = self.loss;
 
         // bp: breakpoint
         for bp in idx {
@@ -73,8 +85,8 @@ impl Pelt {
                     Some(v) => v.clone(),
                 };
 
-                let loss = cost::l1(signal, *t, bp as usize);
-                tmp_part.insert((*t, bp), loss + lambda);
+                let loss = loss_fn(signal, *t, bp as usize);
+                tmp_part.insert((*t, bp), loss + self.lambda);
 
                 subproblems.push(tmp_part);
             }
@@ -91,7 +103,8 @@ impl Pelt {
             }
             partitions_map.insert(bp, min_part.clone());
 
-            let loss_current_part: f64 = partitions_map.get(&bp).unwrap().values().sum();
+            let loss_current_part: f64 =
+                partitions_map.get(&bp).unwrap().values().sum::<f64>() + self.lambda;
 
             admissible = admissible
                 .iter()
@@ -99,7 +112,7 @@ impl Pelt {
                 // get total loss of partition
                 .map(|(t, partition)| (t, partition.values().sum::<f64>()))
                 // keep elements that have a lower loss than the current partition
-                .filter(|(t, sum_loss)| sum_loss < &(loss_current_part + lambda))
+                .filter(|(t, sum_loss)| sum_loss < &(loss_current_part))
                 // only keep t
                 .map(|(t, sum_loss)| *t)
                 .collect();
@@ -112,18 +125,19 @@ impl Pelt {
     }
 }
 
-impl MutEstimator<Vec<f64>> for Pelt {
+impl MutEstimator<Vec<usize>> for Pelt {
     fn fit(&mut self, signal: &Vec<f64>) -> &Self {
         self.n_samples = signal.len();
         self
     }
 
-    fn predict(&mut self, signal: &Vec<f64>) -> Vec<f64> {
-        vec![0.]
+    fn predict(&mut self, signal: &Vec<f64>) -> Vec<usize> {
+        self.segmentation(signal)
     }
 
-    fn fit_predict(&mut self, signal: &Vec<f64>) -> Vec<f64> {
-        vec![0.]
+    fn fit_predict(&mut self, signal: &Vec<f64>) -> Vec<usize> {
+        self.fit(signal);
+        self.segmentation(signal)
     }
 }
 
@@ -150,11 +164,11 @@ mod _tests {
 
     #[test]
     fn test_init() {
-        let p = Pelt::new(None, None);
+        let p = Pelt::new(None, None, None, 10.);
         assert_eq!(p.min_size, 2);
         assert_eq!(p.jump, 5);
 
-        let p = Pelt::new(Some(50), None);
+        let p = Pelt::new(Some(50), None, None, 10.);
         assert_eq!(p.jump, 50)
     }
 
@@ -165,7 +179,7 @@ mod _tests {
     }
 
     fn pelt_fixture() -> (Pelt, Vec<f64>) {
-        let mut p = Pelt::new(Some(5), Some(2));
+        let mut p = Pelt::new(Some(5), Some(2), None, 10.);
         let s = std::fs::read_to_string("signal.txt").unwrap();
         let signal: Vec<f64> = s.split("\n").map(|x| x.parse().unwrap()).collect();
         p.fit(&signal);
@@ -175,7 +189,7 @@ mod _tests {
     #[test]
     fn test_segmentation() {
         let (p, signal) = pelt_fixture();
-        let cp = p.segmentation(10., &signal);
+        let cp = p.segmentation(&signal);
         assert_eq!(cp, [100, 200]);
     }
 }
