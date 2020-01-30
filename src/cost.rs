@@ -19,8 +19,8 @@ pub fn var(x: &[f64]) -> f64 {
     sum_diff
 }
 
-fn median(numbers: &Vec<f64>) -> f64 {
-    let mut numbers: Vec<f64>= numbers.clone();
+fn median(numbers: &[f64]) -> f64 {
+    let mut numbers: Vec<f64> = numbers.iter().cloned().collect();
     numbers.sort_by(|a, b| a.partial_cmp(b).unwrap());
 
     let mid = numbers.len() / 2;
@@ -32,19 +32,15 @@ fn median(numbers: &Vec<f64>) -> f64 {
 
 }
 
-pub fn l2(signal: &Vec<f64>, start: usize, end: usize) -> f64 {
+pub fn l2(signal: &[f64], start: usize, end: usize) -> f64 {
     var(&signal[start..end]) * (end - start) as f64
 }
 
-pub fn l1(signal: &Vec<f64>, start: usize, end: usize) -> f64 {
-    let sub: Vec<f64> = signal[start..end].to_vec();
-    let med = median(&sub);
+pub fn l1(signal: &[f64], start: usize, end: usize) -> f64 {
+    let sub = &signal[start..end];
+    let med = median(sub);
 
-    let mut loss = vec!();
-    for s in sub.iter() {
-        loss.push((s - med).abs())
-    }
-    loss.iter().sum()
+    sub.iter().map(|a| (a - med).abs()).sum()
 }
 
 
