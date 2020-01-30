@@ -7,7 +7,7 @@ use pyo3::prelude::*;
 use crate::estimator::MutEstimator;
 
 #[pymodule]
-fn fastpelt(py: Python, m: &PyModule) -> PyResult<()> {
+fn fastpeltrust(py: Python, m: &PyModule) -> PyResult<()> {
     // Note that the `#[pyfn()]` annotation automatically converts the arguments from
     // Python objects to Rust values; and the Rust return value back into a Python object.
 
