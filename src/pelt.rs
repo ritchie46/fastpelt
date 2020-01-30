@@ -20,11 +20,11 @@ pub struct Pelt {
     min_size: usize,
     n_samples: usize,
     loss: fn(signal: &[f64], start: usize, end: usize) -> f64,
-    lambda: f64,
+    pen: f64,
 }
 
 impl Pelt {
-    pub fn new(jump: Option<usize>, min_size: Option<usize>, loss: Option<&str>, lambda: f64) -> Pelt {
+    pub fn new(jump: Option<usize>, min_size: Option<usize>, loss: Option<&str>, pen: f64) -> Pelt {
         let jump = match jump {
             Some(v) => v,
             _ => 5,
@@ -49,14 +49,14 @@ impl Pelt {
             min_size,
             n_samples: 0,
             loss,
-            lambda,
+            pen: pen,
         }
     }
 
     fn segmentation(&self, signal: &Vec<f64>) -> Vec<usize> {
         let idx = proposed_idx(self.n_samples, self.jump, self.min_size);
 
-        // Maps (t, breakpoint) to loss + Lambda
+        // Maps (t, breakpoint) to loss + pen
         let first_part = dict!((0, 0) => 0.);
         // partitions[t] contains the optimal partition of signal[0:t]
         let mut partitions_map = dict!(0 => first_part);
@@ -95,7 +95,7 @@ impl Pelt {
                 };
 
                 let loss = loss_fn(signal, *t, bp as usize);
-                tmp_part.insert((*t, bp), loss + self.lambda);
+                tmp_part.insert((*t, bp), loss + self.pen);
 
                 subproblems.push(tmp_part);
             }
@@ -113,7 +113,7 @@ impl Pelt {
             partitions_map.insert(bp, min_part.clone());
 
             let loss_current_part: f64 =
-                partitions_map.get(&bp).unwrap().values().sum::<f64>() + self.lambda;
+                partitions_map.get(&bp).unwrap().values().sum::<f64>() + self.pen;
 
             admissible = admissible
                 .iter()
