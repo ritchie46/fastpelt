@@ -9,7 +9,7 @@ edition = "2018"
 [dependencies]
 
 [lib]
-name = "fastpelt"
+name = "fastpeltrust"
 crate-type = ["cdylib"]
 
 [dependencies.pyo3]
