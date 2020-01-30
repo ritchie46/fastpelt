@@ -1,4 +1,5 @@
 use crate::cost;
+extern crate test;
 use crate::estimator::MutEstimator;
 use std::collections::HashMap;
 use test::Bencher;
@@ -180,5 +181,11 @@ mod _tests {
         let (p, signal) = pelt_fixture();
         let cp = p.segmentation(10., &signal);
         assert_eq!(cp, [100, 200]);
+    }
+
+    #[bench]
+    fn bench_segmentation(b: &mut Bencher) {
+        let (p, signal) = pelt_fixture();
+        b.iter(|| p.segmentation(10., &signal));
     }
 }

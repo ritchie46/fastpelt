@@ -1,7 +1,7 @@
 SHELL = /bin/bash
 
 test:
-	@cargo test
+	@cargo +nightly test
 
 bench:
-	@cargo bench
+	@cargo +nightly bench

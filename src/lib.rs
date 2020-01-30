@@ -1,3 +1,4 @@
+#![feature(test)]
 mod consts;
 mod cost;
 mod estimator;
