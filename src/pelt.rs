@@ -14,18 +14,17 @@ macro_rules! dict(
 }}
 );
 
-struct Pelt {
+pub struct Pelt {
     jump: usize,
     /// Min size of the signal.
     min_size: usize,
     n_samples: usize,
-    best_partition: Option<Vec<usize>>,
     loss: fn(signal: &[f64], start: usize, end: usize) -> f64,
     lambda: f64,
 }
 
 impl Pelt {
-    fn new(jump: Option<usize>, min_size: Option<usize>, loss: Option<&str>, lambda: f64) -> Pelt {
+    pub fn new(jump: Option<usize>, min_size: Option<usize>, loss: Option<&str>, lambda: f64) -> Pelt {
         let jump = match jump {
             Some(v) => v,
             _ => 5,
@@ -49,7 +48,6 @@ impl Pelt {
             jump,
             min_size,
             n_samples: 0,
-            best_partition: None,
             loss,
             lambda,
         }

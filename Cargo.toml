@@ -8,3 +8,11 @@ edition = "2018"
 
 [dependencies]
 fnv = "1.0.3"
+
+[lib]
+name = "fastpelt"
+crate-type = ["cdylib"]
+
+[dependencies.pyo3]
+version = "0.9.0-alpha.1"
+features = ["extension-module"]
