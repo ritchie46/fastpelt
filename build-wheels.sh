@@ -6,14 +6,17 @@ export PATH="$HOME/.cargo/bin:$PATH"
 
 cd /io
 
-for PYBIN in /opt/python/{cp37-cp37m,cp36-cp36m}/bin; do
+for PYBIN in /opt/python/{cp37-cp37m,cp36-cp36m,cp38-cp38m}/bin; do
     export PYTHON_SYS_EXECUTABLE="$PYBIN/python"
-
-    "${PYBIN}/pip" install -U setuptools wheel setuptools-rust
+#  pin wheel version
+# https://github.com/pypa/auditwheel/issues/102
+    "${PYBIN}/pip" install -U setuptools wheel==0.31.1 setuptools-rust
     "${PYBIN}/python" setup.py bdist_wheel
 done
 
-set +e
 for whl in dist/*.whl; do
     auditwheel repair "$whl" -w dist/
 done
+
+rm -r build/
+rm -r *.egg-info/*
