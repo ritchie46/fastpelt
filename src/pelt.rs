@@ -1,8 +1,8 @@
 use crate::cost;
 extern crate test;
 use crate::estimator::MutEstimator;
-use std::collections::HashMap;
 use fnv::FnvHashMap;
+use std::collections::HashMap;
 
 macro_rules! dict(
 { $($key:expr => $value:expr),+} => {{
@@ -201,10 +201,10 @@ mod _tests {
         let cp = p.segmentation(&signal);
         assert_eq!(cp, [100, 200]);
     }
-
+    use test::Bencher;
     #[bench]
     fn bench_segmentation(b: &mut Bencher) {
         let (p, signal) = pelt_fixture();
-        b.iter(|| p.segmentation(10., &signal));
+        b.iter(|| p.segmentation(&signal));
     }
 }

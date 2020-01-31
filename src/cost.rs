@@ -19,7 +19,7 @@ pub fn var(x: &[f64]) -> f64 {
     sum_diff
 }
 
-fn median(numbers: &[f64]) -> f64 {
+fn nlogn_median(numbers: &[f64]) -> f64 {
     let mut numbers: Vec<f64> = numbers.iter().cloned().collect();
     numbers.sort_by(|a, b| a.partial_cmp(b).unwrap());
 
@@ -31,14 +31,20 @@ fn median(numbers: &[f64]) -> f64 {
     }
 }
 
+fn fast_median(a: &[f64]) -> f64 {
+    let mut x = a.to_vec();
+    let idx = x.len() / 2;
+    *x.partition_at_index_by(idx, |a, b| a.partial_cmp(b).unwrap())
+        .1
+}
+
 pub fn l2(signal: &[f64], start: usize, end: usize) -> f64 {
     var(&signal[start..end]) * (end - start) as f64
 }
 
 pub fn l1(signal: &[f64], start: usize, end: usize) -> f64 {
     let sub = &signal[start..end];
-    let med = median(sub);
-
+    let med = fast_median(sub);
     sub.iter().map(|a| (a - med).abs()).sum()
 }
 

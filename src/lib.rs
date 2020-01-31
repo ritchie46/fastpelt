@@ -1,10 +1,11 @@
 #![feature(test)]
+#![feature(slice_partition_at_index)]
 mod consts;
 mod cost;
 mod estimator;
 mod pelt;
-use pyo3::prelude::*;
 use crate::estimator::MutEstimator;
+use pyo3::prelude::*;
 
 #[pymodule]
 fn fastpeltrust(py: Python, m: &PyModule) -> PyResult<()> {
