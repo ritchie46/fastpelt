@@ -1,51 +1,64 @@
 use crate::consts;
+use crate::err;
 
 pub fn log_pdf(x: f64, mean: f64, std_dev: f64) -> f64 {
     let d = (x - mean) / std_dev;
     (-0.5 * d * d) - consts::LN_SQRT_2PI - std_dev.ln()
 }
 
-pub fn mean(x: &[f64]) -> f64 {
-    x.iter().sum::<f64>() / x.len() as f64
+fn mean(x: &[f64]) -> Option<f64> {
+    match x {
+        [] => None,
+        _ => Some(x.iter().sum::<f64>() / x.len() as f64),
+    }
 }
 
-pub fn var(x: &[f64]) -> f64 {
-    let mu = mean(x);
+fn var(x: &[f64]) -> Option<f64> {
+    let mu = mean(x)?;
     let mut sum_diff = 0.;
 
     for v in x {
         sum_diff += (v - mu).powf(2.)
     }
-    sum_diff
+    Some(sum_diff)
 }
 
-fn nlogn_median(numbers: &[f64]) -> f64 {
+fn nlogn_median(numbers: &[f64]) -> Option<f64> {
     let mut numbers: Vec<f64> = numbers.iter().cloned().collect();
     numbers.sort_by(|a, b| a.partial_cmp(b).unwrap());
 
     let mid = numbers.len() / 2;
     if numbers.len() % 2 == 0 {
-        mean(&vec![numbers[mid - 1], numbers[mid]]) as f64
+        mean(&vec![numbers[mid - 1], numbers[mid]])
     } else {
-        numbers[mid]
+        Some(numbers[mid])
     }
 }
 
-fn fast_median(a: &[f64]) -> f64 {
+fn fast_median(a: &[f64]) -> Option<f64> {
     let mut x = a.to_vec();
     let idx = x.len() / 2;
-    *x.partition_at_index_by(idx, |a, b| a.partial_cmp(b).unwrap())
-        .1
+    Some(
+        *x.partition_at_index_by(idx, |a, b| a.partial_cmp(b).unwrap())
+            .1,
+    )
 }
 
-pub fn l2(signal: &[f64], start: usize, end: usize) -> f64 {
-    var(&signal[start..end]) * (end - start) as f64
+pub fn l2(signal: &[f64], start: usize, end: usize) -> Option<f64> {
+    if signal.len() == 0 {
+        return None;
+    }
+    let variance = var(&signal[start..end])?;
+    Some(variance * (end - start) as f64)
 }
 
-pub fn l1(signal: &[f64], start: usize, end: usize) -> f64 {
+pub fn l1(signal: &[f64], start: usize, end: usize) -> Option<f64> {
+    if signal.len() == 0 {
+        return None;
+    }
     let sub = &signal[start..end];
-    let med = fast_median(sub);
-    sub.iter().map(|a| (a - med).abs()).sum()
+    let med = fast_median(sub)?;
+    Some(sub.iter().map(|a| (a - med).abs()).sum())
 }
 
 #[cfg(test)]

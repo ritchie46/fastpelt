@@ -1,5 +1,6 @@
 use crate::cost;
 extern crate test;
+use crate::err;
 use crate::estimator::MutEstimator;
 use fnv::FnvHashMap;
 use std::collections::HashMap;
@@ -19,7 +20,7 @@ pub struct Pelt {
     /// Min size of the signal.
     min_size: usize,
     n_samples: usize,
-    loss: fn(signal: &[f64], start: usize, end: usize) -> f64,
+    loss: fn(signal: &[f64], start: usize, end: usize) -> Option<f64>,
     pen: f64,
 }
 
@@ -53,7 +54,7 @@ impl Pelt {
         }
     }
 
-    fn segmentation(&self, signal: &Vec<f64>) -> Vec<usize> {
+    fn segmentation(&self, signal: &Vec<f64>) -> Option<Vec<usize>> {
         let idx = proposed_idx(self.n_samples, self.jump, self.min_size);
 
         // Maps (t, breakpoint) to loss + pen
@@ -94,7 +95,7 @@ impl Pelt {
                     Some(v) => v.clone(),
                 };
 
-                let loss = loss_fn(signal, *t, bp as usize);
+                let loss = loss_fn(signal, *t, bp as usize)?;
                 tmp_part.insert((*t, bp), loss + self.pen);
 
                 subproblems.push(tmp_part);
@@ -130,7 +131,7 @@ impl Pelt {
         let mut cp: Vec<usize> = best_part.keys().map(|(start, end)| *end).collect();
         cp.sort();
         cp.remove(0);
-        cp
+        Some(cp)
     }
 }
 
@@ -140,11 +141,11 @@ impl MutEstimator<Vec<usize>> for Pelt {
         self
     }
 
-    fn predict(&mut self, signal: &Vec<f64>) -> Vec<usize> {
+    fn predict(&mut self, signal: &Vec<f64>) -> Option<Vec<usize>> {
         self.segmentation(signal)
     }
 
-    fn fit_predict(&mut self, signal: &Vec<f64>) -> Vec<usize> {
+    fn fit_predict(&mut self, signal: &Vec<f64>) -> Option<Vec<usize>> {
         self.fit(signal);
         self.segmentation(signal)
     }
@@ -198,7 +199,7 @@ mod _tests {
     #[test]
     fn test_segmentation() {
         let (p, signal) = pelt_fixture();
-        let cp = p.segmentation(&signal);
+        let cp = p.segmentation(&signal).unwrap();
         assert_eq!(cp, [100, 200]);
     }
     use test::Bencher;

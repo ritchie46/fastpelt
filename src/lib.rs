@@ -22,7 +22,7 @@ fn fastpeltrust(py: Python, m: &PyModule) -> PyResult<()> {
         pen: f64,
     ) -> PyResult<Vec<usize>> {
         let mut p = pelt::Pelt::new(Some(jump), Some(min_size), Some(loss), pen);
-        Ok(p.fit_predict(&signal))
+        Ok(p.fit_predict(&signal).unwrap())
     }
 
     Ok(())
