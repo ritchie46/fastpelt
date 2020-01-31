@@ -1,6 +1,5 @@
 use crate::cost;
 extern crate test;
-use crate::err;
 use crate::estimator::MutEstimator;
 use fnv::FnvHashMap;
 use std::collections::HashMap;

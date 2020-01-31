@@ -1,4 +1,3 @@
-use crate::err;
 
 pub trait MutEstimator<T> {
     fn fit(&mut self, signal: &Vec<f64>) -> &Self;

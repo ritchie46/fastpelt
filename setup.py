@@ -17,6 +17,8 @@ setup_requires = ["setuptools-rust>=0.10.1", "wheel"]
 setup(
     name="fastpelt",
     version="0.1",
+    author="Ritchie Vink",
+    author_email="ritchie46@gmail.com",
     rust_extensions=[RustExtension("fastpelt.fastpeltrust", debug=False, binding=Binding.PyO3)],
     packages=["fastpelt"],
     include_package_data=True,
