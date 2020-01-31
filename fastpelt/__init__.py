@@ -2,7 +2,7 @@ from .fastpeltrust import fit_predict
 
 
 class FastPelt:
-    def __init__(self, min_size=2, jump=5, loss="l1", pen=5):
+    def __init__(self, min_size=2, jump=5, loss="l2", pen=5):
         self.min_size = min_size
         self.jump = jump
         self.loss = loss
