@@ -13,7 +13,7 @@ This is a port of the [ruptures](https://github.com/deepcharles/ruptures) Python
 
 ```python
 import fastpelt
-mfast = fastpelt.FastPelt(pen=10, loss="l1")
+mfast = fastpelt.Pelt(pen=10, loss="l1")
 mfast.predict(a)
 ```
 
