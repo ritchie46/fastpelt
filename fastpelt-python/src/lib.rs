@@ -1,5 +1,3 @@
-#![feature(test)]
-#![feature(slice_partition_at_index)]
 extern crate pelt;
 use pelt::Pelt;
 use pelt::estimator::{MutEstimator, Vec2d};

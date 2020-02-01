@@ -137,19 +137,19 @@ impl Pelt {
 impl MutEstimator<Vec<usize>> for Pelt {
     fn fit(&mut self, signal: &Vec2d) -> &Self {
         self.n_samples = signal[0].len();
-//        if self.n_samples < self.min_size {
-//            panic!("Cannot have min_size partitions larger than signal length.")
-//        }
+        if self.n_samples < self.min_size {
+            panic!("Cannot have min_size partitions larger than signal length.")
+        }
         self
     }
 
     fn predict(&mut self, signal: &Vec2d) -> Option<Vec<usize>> {
+        self.fit(signal);
         self.segmentation(signal)
     }
 
     fn fit_predict(&mut self, signal: &Vec2d) -> Option<Vec<usize>> {
-        self.fit(signal);
-        self.segmentation(signal)
+        self.predict(signal)
     }
 }
 
