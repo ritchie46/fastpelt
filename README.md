@@ -17,17 +17,14 @@ mfast = fastpelt.Pelt(pen=10, loss="l1")
 mfast.predict(a)
 ```
 
-## Performance
-
-![](img/cmp.png)
-
-
 ## Rust 
+
+* [API documentation](https://docs.rs/pelt/)
 
 ```rust 
 extern crate pelt;
 use std::fs;
-use pelt::estimator::MutEstimator;
+use pelt::{MutEstimator, Pelt};
 
 fn main() {
     let s = fs::read_to_string("./pelt-rs/signal.txt").unwrap();
@@ -38,7 +35,7 @@ fn main() {
     let loss = Some("l1");
     let pen = 3.;
 
-    let mut m = pelt::Pelt::new(jump, min_size, loss, pen);
+    let mut m = Pelt::new(jump, min_size, loss, pen);
     println!("{:?}", m.predict(&signal))
 }
 ```
@@ -46,3 +43,9 @@ fn main() {
 ```text
 Some([100, 200])
 ```
+
+## Performance
+
+![](img/cmp.png)
+
+

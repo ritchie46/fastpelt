@@ -2,7 +2,6 @@ use crate::cost;
 extern crate test;
 use crate::estimator::{MutEstimator, Vec2d};
 use fnv::FnvHashMap;
-use std::collections::HashMap;
 
 macro_rules! dict(
 { $($key:expr => $value:expr),+} => {{
@@ -14,6 +13,21 @@ macro_rules! dict(
 }}
 );
 
+/// Pruned Exact Linear Time changepoint detection model.
+/// # Arguments
+///
+///  * `jump` - Distance between proposal changepoints.
+///  * `min_size` - Minimal distance between changepoints.
+///  * `n_samples` - No. of samples in signal.
+///  * `loss` - Loss function to use.
+///  * `pen` - Penalty term.
+///
+///  # Example
+///
+///  ```
+///  let mut m = Pelt::new(jump, min_size, loss, pen);
+///  println!("{:?}", m.predict(&signal))
+///  ```
 pub struct Pelt {
     jump: usize,
     /// Min size of the partitions.
@@ -24,6 +38,7 @@ pub struct Pelt {
 }
 
 impl Pelt {
+    /// Create new Pelt instance. Note that the variable should be created mutable.
     pub fn new(jump: Option<usize>, min_size: Option<usize>, loss: Option<&str>, pen: f64) -> Pelt {
         let jump = match jump {
             Some(v) => v,
@@ -135,6 +150,10 @@ impl Pelt {
 }
 
 impl MutEstimator<Vec<usize>> for Pelt {
+    /// Set the number of samples in the signal.
+    /// Explicit call is not needed.
+    /// # Panics
+    /// if `min_size` < `signal.len()`
     fn fit(&mut self, signal: &Vec2d) -> &Self {
         self.n_samples = signal[0].len();
         if self.n_samples < self.min_size {
@@ -143,11 +162,19 @@ impl MutEstimator<Vec<usize>> for Pelt {
         self
     }
 
+    /// Retreive the changepoints in the signal.
+    /// # Arguments
+    /// * `signal` - Signals stacked in 2D. All signals should be equal length.
+    ///
+    /// # Panics
+    /// if `min_size` < `signal.len()`
+    ///
     fn predict(&mut self, signal: &Vec2d) -> Option<Vec<usize>> {
         self.fit(signal);
         self.segmentation(signal)
     }
 
+    /// See [predict](/pelt/estimator/trait.MutEstimator.html#tymethod.predict)
     fn fit_predict(&mut self, signal: &Vec2d) -> Option<Vec<usize>> {
         self.predict(signal)
     }

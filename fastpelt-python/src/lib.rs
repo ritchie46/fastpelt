@@ -1,6 +1,5 @@
 extern crate pelt;
-use pelt::Pelt;
-use pelt::estimator::{MutEstimator, Vec2d};
+use pelt::{MutEstimator, Vec2d, Pelt};
 use pyo3::prelude::*;
 
 #[pymodule]

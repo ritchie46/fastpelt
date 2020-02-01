@@ -1,10 +1,4 @@
-use crate::consts;
 use crate::estimator::Vec2d;
-
-pub fn log_pdf(x: f64, mean: f64, std_dev: f64) -> f64 {
-    let d = (x - mean) / std_dev;
-    (-0.5 * d * d) - consts::LN_SQRT_2PI - std_dev.ln()
-}
 
 fn mean(x: &[f64]) -> Option<f64> {
     match x {
