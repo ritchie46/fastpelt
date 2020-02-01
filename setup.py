@@ -21,6 +21,7 @@ setup(
     author_email="ritchie46@gmail.com",
     rust_extensions=[RustExtension("fastpelt.fastpeltrust", debug=False, binding=Binding.PyO3)],
     packages=["fastpelt"],
+    install_requires=["numpy"]
     include_package_data=True,
     # rust extensions are not zip safe, just like C-extensions.
     zip_safe=False,

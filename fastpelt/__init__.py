@@ -1,7 +1,4 @@
-from .fastpeltrust import fit_predict
-
-
-class FastPelt:
+class Pelt:
     def __init__(self, min_size=2, jump=5, loss="l2", pen=5):
         """
         Pruned Exact Linear Time
@@ -39,7 +36,18 @@ class FastPelt:
         changepoints : list
 
         """
-        return fit_predict(
+        if not isinstance(signal, np.ndarray):
+            signal = np.array(signal)
+
+        length = len(signal.shape)
+        if length == 2:
+            signal = signal.T
+        elif length == 1:
+            signal = signal.reshape(1, -1)
+        elif length > 2:
+            raise ValueError("Wrong number of dimensions. Should be 2D.")       
+            
+        return fastpeltrust.fit_predict(
             signal, min_size=self.min_size, loss=self.loss, jump=self.jump, pen=self.pen
         )
 
@@ -47,7 +55,8 @@ class FastPelt:
         """
         Parameters
         ----------
-        signal : list/ np.array
+        signal : np.array
+            2D array. Columns are signals, rows are time dimension.
 
         Returns
         -------

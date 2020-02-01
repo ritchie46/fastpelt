@@ -49,7 +49,7 @@ impl Pelt {
             min_size,
             n_samples: 0,
             loss,
-            pen: pen,
+            pen,
         }
     }
 
@@ -137,9 +137,9 @@ impl Pelt {
 impl MutEstimator<Vec<usize>> for Pelt {
     fn fit(&mut self, signal: &Vec2d) -> &Self {
         self.n_samples = signal[0].len();
-        if self.n_samples < self.min_size {
-            panic!("Cannot have min_size partitions larger than signal length.")
-        }
+//        if self.n_samples < self.min_size {
+//            panic!("Cannot have min_size partitions larger than signal length.")
+//        }
         self
     }
 
