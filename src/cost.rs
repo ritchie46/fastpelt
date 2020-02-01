@@ -1,4 +1,5 @@
 use crate::consts;
+use crate::estimator::Vec2d;
 
 pub fn log_pdf(x: f64, mean: f64, std_dev: f64) -> f64 {
     let d = (x - mean) / std_dev;
@@ -43,21 +44,29 @@ fn fast_median(a: &[f64]) -> Option<f64> {
     )
 }
 
-pub fn l2(signal: &[f64], start: usize, end: usize) -> Option<f64> {
-    if signal.len() == 0 {
-        return None;
+pub fn l2(signal: &Vec2d, start: usize, end: usize) -> Option<f64> {
+    let mut variance = 0.;
+    for s in signal {
+        if s.len() == 0 {
+            return None;
+        }
+        variance += var(&s[start..end])?;
     }
-    let variance = var(&signal[start..end])?;
+
     Some(variance * (end - start) as f64)
 }
 
-pub fn l1(signal: &[f64], start: usize, end: usize) -> Option<f64> {
-    if signal.len() == 0 {
-        return None;
+pub fn l1(signal: &Vec2d, start: usize, end: usize) -> Option<f64> {
+    let mut loss = 0.;
+    for s in signal {
+        if s.len() == 0 {
+            return None;
+        }
+        let sub = &s[start..end];
+        let med = fast_median(sub)?;
+        loss += sub.iter().map(|a| (a - med).abs()).sum::<f64>()
     }
-    let sub = &signal[start..end];
-    let med = fast_median(sub)?;
-    Some(sub.iter().map(|a| (a - med).abs()).sum())
+    Some(loss)
 }
 
 #[cfg(test)]

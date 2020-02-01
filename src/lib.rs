@@ -4,7 +4,7 @@ mod consts;
 mod cost;
 mod estimator;
 mod pelt;
-use crate::estimator::MutEstimator;
+use crate::estimator::{MutEstimator, Vec2d};
 use pyo3::prelude::*;
 
 #[pymodule]
@@ -15,7 +15,7 @@ fn fastpeltrust(py: Python, m: &PyModule) -> PyResult<()> {
     #[pyfn(m, "fit_predict")]
     fn fit_predict(
         _py: Python,
-        signal: Vec<f64>,
+        signal: Vec2d,
         min_size: usize,
         loss: &str,
         jump: usize,

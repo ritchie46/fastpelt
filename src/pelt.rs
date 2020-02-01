@@ -1,6 +1,6 @@
 use crate::cost;
 extern crate test;
-use crate::estimator::MutEstimator;
+use crate::estimator::{MutEstimator, Vec2d};
 use fnv::FnvHashMap;
 use std::collections::HashMap;
 
@@ -16,10 +16,10 @@ macro_rules! dict(
 
 pub struct Pelt {
     jump: usize,
-    /// Min size of the signal.
+    /// Min size of the partitions.
     min_size: usize,
     n_samples: usize,
-    loss: fn(signal: &[f64], start: usize, end: usize) -> Option<f64>,
+    loss: fn(signal: &Vec2d, start: usize, end: usize) -> Option<f64>,
     pen: f64,
 }
 
@@ -53,7 +53,7 @@ impl Pelt {
         }
     }
 
-    fn segmentation(&self, signal: &Vec<f64>) -> Option<Vec<usize>> {
+    fn segmentation(&self, signal: &Vec2d) -> Option<Vec<usize>> {
         let idx = proposed_idx(self.n_samples, self.jump, self.min_size);
 
         // Maps (t, breakpoint) to loss + pen
@@ -128,23 +128,26 @@ impl Pelt {
         }
         let best_part = &partitions_map[&self.n_samples];
         let mut cp: Vec<usize> = best_part.keys().map(|(start, end)| *end).collect();
-        cp.sort();
+        cp.sort_unstable();
         cp.remove(0);
         Some(cp)
     }
 }
 
 impl MutEstimator<Vec<usize>> for Pelt {
-    fn fit(&mut self, signal: &Vec<f64>) -> &Self {
-        self.n_samples = signal.len();
+    fn fit(&mut self, signal: &Vec2d) -> &Self {
+        self.n_samples = signal[0].len();
+        if self.n_samples < self.min_size {
+            panic!("Cannot have min_size partitions larger than signal length.")
+        }
         self
     }
 
-    fn predict(&mut self, signal: &Vec<f64>) -> Option<Vec<usize>> {
+    fn predict(&mut self, signal: &Vec2d) -> Option<Vec<usize>> {
         self.segmentation(signal)
     }
 
-    fn fit_predict(&mut self, signal: &Vec<f64>) -> Option<Vec<usize>> {
+    fn fit_predict(&mut self, signal: &Vec2d) -> Option<Vec<usize>> {
         self.fit(signal);
         self.segmentation(signal)
     }
@@ -187,10 +190,10 @@ mod _tests {
         assert_eq!(proposed_idx(20, 5, 2), vec!(5, 10, 15, 20))
     }
 
-    fn pelt_fixture() -> (Pelt, Vec<f64>) {
+    fn pelt_fixture() -> (Pelt, Vec2d) {
         let mut p = Pelt::new(Some(5), Some(2), None, 10.);
         let s = std::fs::read_to_string("signal.txt").unwrap();
-        let signal: Vec<f64> = s.split("\n").map(|x| x.parse().unwrap()).collect();
+        let signal: Vec<Vec<f64>> = vec![s.split("\n").map(|x| x.parse().unwrap()).collect()];
         p.fit(&signal);
         (p, signal)
     }
