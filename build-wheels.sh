@@ -4,6 +4,9 @@ set -ex
 curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain nightly -y
 export PATH="$HOME/.cargo/bin:$PATH"
 
+# remove wheels of previous build
+rm dist/*.whl
+
 cd /io
 
 for PYBIN in /opt/python/{cp37-cp37m,cp36-cp36m,cp38-cp38}/bin; do
@@ -20,4 +23,4 @@ for whl in dist/*.whl; do
 done
 
 rm -r build/
-rm -r *.egg-info/*
+rm -r *.egg-info
