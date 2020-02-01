@@ -20,7 +20,7 @@ fn var(x: &[f64]) -> Option<f64> {
     for v in x {
         sum_diff += (v - mu).powf(2.)
     }
-    Some(sum_diff)
+    Some(sum_diff / x.len() as f64)
 }
 
 fn nlogn_median(numbers: &[f64]) -> Option<f64> {
