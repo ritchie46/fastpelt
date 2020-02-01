@@ -7,7 +7,11 @@ test:
 bench:
 	@cargo +nightly bench
 
-
 wheels:
-	@ docker run --rm -v $(current_dir):/io quay.io/pypa/manylinux1_x86_64 /io/build-wheels.sh
+	@docker run --rm -v $(current_dir):/io quay.io/pypa/manylinux1_x86_64 /io/build-wheels.sh
 
+pypi-test:
+	@twine upload --repository testpypi dist/*
+
+pypi-release:
+	@twine upload --repository pypi dist/*

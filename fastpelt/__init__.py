@@ -1,3 +1,6 @@
+from .fastpeltrust import fit_predict
+import numpy as np
+
 class Pelt:
     def __init__(self, min_size=2, jump=5, loss="l2", pen=5):
         """
@@ -47,7 +50,7 @@ class Pelt:
         elif length > 2:
             raise ValueError("Wrong number of dimensions. Should be 2D.")       
             
-        return fastpeltrust.fit_predict(
+        return fit_predict(
             signal, min_size=self.min_size, loss=self.loss, jump=self.jump, pen=self.pen
         )
 
