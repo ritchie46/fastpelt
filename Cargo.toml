@@ -1,18 +1,6 @@
-[package]
-name = "pelt"
-version = "0.1.0"
-authors = ["ritchie46 <ritchie46@gmail.com>"]
-edition = "2018"
+[workspace]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-fnv = "1.0.3"
-
-[lib]
-name = "fastpeltrust"
-crate-type = ["cdylib"]
-
-[dependencies.pyo3]
-version = "0.9.0-alpha.1"
-features = ["extension-module"]
+members = [
+    "fastpelt-python",
+    "pelt-rs"
+]

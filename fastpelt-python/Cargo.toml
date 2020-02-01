@@ -1,0 +1,16 @@
+[package]
+name = "pelt_python_ext"
+version = "0.1.0"
+authors = ["ritchie46 <ritchie46@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "fastpeltrust"
+crate-type = ["cdylib"]
+
+[dependencies.pyo3]
+version = "0.9.0-alpha.1"
+features = ["extension-module"]
+
+[dependencies]
+pelt = {path = "../pelt-rs"}

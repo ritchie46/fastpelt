@@ -1,0 +1,11 @@
+[package]
+name = "pelt"
+version = "0.1.0"
+authors = ["ritchie46 <ritchie46@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+fnv = "1.0.3"
+
+[lib]
+name = "pelt"

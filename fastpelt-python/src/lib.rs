@@ -1,10 +1,8 @@
 #![feature(test)]
 #![feature(slice_partition_at_index)]
-mod consts;
-mod cost;
-mod estimator;
-mod pelt;
-use crate::estimator::{MutEstimator, Vec2d};
+extern crate pelt;
+use pelt::Pelt;
+use pelt::estimator::{MutEstimator, Vec2d};
 use pyo3::prelude::*;
 
 #[pymodule]
@@ -21,7 +19,7 @@ fn fastpeltrust(py: Python, m: &PyModule) -> PyResult<()> {
         jump: usize,
         pen: f64,
     ) -> PyResult<Vec<usize>> {
-        let mut p = pelt::Pelt::new(Some(jump), Some(min_size), Some(loss), pen);
+        let mut p = Pelt::new(Some(jump), Some(min_size), Some(loss), pen);
         Ok(p.fit_predict(&signal).unwrap())
     }
 
